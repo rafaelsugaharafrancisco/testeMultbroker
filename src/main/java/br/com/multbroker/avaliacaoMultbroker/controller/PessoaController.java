@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,17 +34,19 @@ public class PessoaController {
 	}
 	
 	@PostMapping("/pessoa")
-	public void cria(@RequestBody Pessoa novaPessoa) {
+	public ResponseEntity<String> cria(@RequestBody Pessoa novaPessoa) {
 		repository.save(novaPessoa);
+		return new ResponseEntity<String>("Pessoa " + novaPessoa.getNome() + " registrada com sucesso", HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/pessoa/{id}")
-	public void deleta(@PathVariable("id") Long id) {
+	public ResponseEntity<String> deleta(@PathVariable("id") Long id) {
         repository.deleteById(id);
+        return new ResponseEntity<String>("Pessoa com id " + id + "excluido com sucesso", HttpStatus.OK);
 	}
 	
 	@PutMapping("/pessoa")
-	public void atualiza( @RequestBody Pessoa pessoa) {
+	public ResponseEntity<String> atualiza( @RequestBody Pessoa pessoa) {
 		
 		Optional<Pessoa> buscaPessoa = repository.findById(pessoa.getId());
 		
@@ -53,6 +57,11 @@ public class PessoaController {
 			pessoaEncontrada.setEmail(pessoa.getEmail());
 			
 			repository.save(pessoaEncontrada);
+			
+			return new ResponseEntity<String>("Pessoa " + pessoaEncontrada.getNome() + "atualizado com sucesso", HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Pessoa com id " + pessoa.getId() + " não encontrada", HttpStatus.NOT_FOUND);
 		}
+		
 	}
 }
