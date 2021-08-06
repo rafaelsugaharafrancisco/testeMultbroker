@@ -42,7 +42,7 @@ public class PessoaController {
 	@DeleteMapping("/pessoa/{id}")
 	public ResponseEntity<String> deleta(@PathVariable("id") Long id) {
         repository.deleteById(id);
-        return new ResponseEntity<String>("Pessoa com id " + id + "excluido com sucesso", HttpStatus.OK);
+        return new ResponseEntity<String>("Pessoa com id " + id + " excluido com sucesso", HttpStatus.OK);
 	}
 	
 	@PutMapping("/pessoa")
@@ -58,7 +58,7 @@ public class PessoaController {
 			
 			repository.save(pessoaEncontrada);
 			
-			return new ResponseEntity<String>("Pessoa " + pessoaEncontrada.getNome() + "atualizado com sucesso", HttpStatus.OK);
+			return new ResponseEntity<String>("Pessoa " + pessoaEncontrada.getNome() + " atualizado com sucesso", HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>("Pessoa com id " + pessoa.getId() + " não encontrada", HttpStatus.NOT_FOUND);
 		}
