@@ -1,7 +1,6 @@
 package br.com.multbroker.avaliacaoMultbroker.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,45 +22,58 @@ public class PessoaController {
 	@Autowired
 	private PessoaRepository repository;
 	
-	@GetMapping("/pessoa")
-	public List<Pessoa> lista() {
-		return repository.findAll();
+	@GetMapping("/pessoa/lista")
+	public ResponseEntity<List<Pessoa>> lista() {
+		
+		if (repository.findAll().isEmpty()) {
+			return new ResponseEntity<List<Pessoa>>(HttpStatus.NOT_FOUND);
+		}
+		
+		return new ResponseEntity<List<Pessoa>>(repository.findAll(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/pessoa/{id}")
-	public Optional<Pessoa> buscaPorId(@PathVariable("id") Long id) {
-		return repository.findById(id);
-	}
-	
-	@PostMapping("/pessoa")
-	public ResponseEntity<String> cria(@RequestBody Pessoa novaPessoa) {
-		repository.save(novaPessoa);
-		return new ResponseEntity<String>("Pessoa " + novaPessoa.getNome() + " registrada com sucesso", HttpStatus.OK);
-	}
-	
-	@DeleteMapping("/pessoa/{id}")
-	public ResponseEntity<String> deleta(@PathVariable("id") Long id) {
-        repository.deleteById(id);
-        return new ResponseEntity<String>("Pessoa com id " + id + " excluido com sucesso", HttpStatus.OK);
-	}
-	
-	@PutMapping("/pessoa")
-	public ResponseEntity<String> atualiza( @RequestBody Pessoa pessoa) {
+	public ResponseEntity<Pessoa> buscaPorId(@PathVariable("id") Long id) {
 		
-		Optional<Pessoa> buscaPessoa = repository.findById(pessoa.getId());
-		
-		if(buscaPessoa.isPresent()) {
-			Pessoa pessoaEncontrada = buscaPessoa.get();
-			pessoaEncontrada.setNome(pessoa.getNome());
-			pessoaEncontrada.setIdade(pessoa.getIdade());
-			pessoaEncontrada.setEmail(pessoa.getEmail());
-			
-			repository.save(pessoaEncontrada);
-			
-			return new ResponseEntity<String>("Pessoa " + pessoaEncontrada.getNome() + " atualizado com sucesso", HttpStatus.OK);
+		if (repository.findById(id).isPresent()) {
+			return new ResponseEntity<Pessoa>(repository.findById(id).get(), HttpStatus.OK);
 		} else {
-			return new ResponseEntity<String>("Pessoa com id " + pessoa.getId() + " não encontrada", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@PostMapping("/pessoa/cria")
+	public ResponseEntity<Pessoa> cria(@RequestBody Pessoa novaPessoa) {
+		repository.save(novaPessoa);
+		return new ResponseEntity<Pessoa>(novaPessoa, HttpStatus.CREATED);
+	}
+	
+	@DeleteMapping("/pessoa/{id}/remove")
+	public ResponseEntity<Pessoa> deleta(@PathVariable("id") Long id) {
+		
+		if (repository.findById(id).isPresent()) {
+			repository.delete(repository.findById(id).get());
+			
+			return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
 		}
 		
+		return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
+	}
+	
+	@PutMapping("/pessoa/{id}/altera")
+	public ResponseEntity<Pessoa> atualiza(@PathVariable("id") Long id, @RequestBody Pessoa alteraPessoa) {
+		
+		if (repository.findById(id).isPresent()) {
+			Pessoa pessoa = repository.findById(id).get();
+			pessoa.setNome(alteraPessoa.getNome());
+			pessoa.setIdade(alteraPessoa.getIdade());
+			pessoa.setEmail(alteraPessoa.getEmail());
+			
+			repository.save(pessoa);
+			
+			return new ResponseEntity<Pessoa>(pessoa, HttpStatus.OK);
+		}
+		
+		return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
 	}
 }
