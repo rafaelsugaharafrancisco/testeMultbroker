@@ -2,6 +2,9 @@ package br.com.multbroker.avaliacaoMultbroker.controller;
 
 import java.util.List;
 
+import javax.persistence.NoResultException;
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,48 +14,67 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.multbroker.avaliacaoMultbroker.converter.ConversorPessoa;
+import br.com.multbroker.avaliacaoMultbroker.dao.PessoaDao;
 import br.com.multbroker.avaliacaoMultbroker.model.Pessoa;
-import br.com.multbroker.avaliacaoMultbroker.model.PessoaRepository;
 
 @RestController
 public class PessoaController {
 	
 	@Autowired
-	private PessoaRepository repository;
+	private PessoaDao pessoaDao;
 	
 	@GetMapping("/pessoa/lista")
 	public ResponseEntity<List<Pessoa>> lista() {
 		
-		if (repository.findAll().isEmpty()) {
+		if (pessoaDao.findAll().isEmpty()) {
 			return new ResponseEntity<List<Pessoa>>(HttpStatus.NOT_FOUND);
 		}
 		
-		return new ResponseEntity<List<Pessoa>>(repository.findAll(), HttpStatus.OK);
+		return new ResponseEntity<List<Pessoa>>(pessoaDao.findAll(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/pessoa/{id}")
 	public ResponseEntity<Pessoa> buscaPorId(@PathVariable("id") Long id) {
 		
-		if (repository.findById(id).isPresent()) {
-			return new ResponseEntity<Pessoa>(repository.findById(id).get(), HttpStatus.OK);
+		if (pessoaDao.findById(id) != null) {
+			return new ResponseEntity<Pessoa>(pessoaDao.findById(id), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
 		}
 	}
 	
-	@PostMapping("/pessoa/cria")
-	public ResponseEntity<Pessoa> cria(@RequestBody Pessoa novaPessoa) {
-		repository.save(novaPessoa);
-		return new ResponseEntity<Pessoa>(novaPessoa, HttpStatus.CREATED);
+	@GetMapping("/pessoa")
+	public ResponseEntity<Pessoa> buscaPorNome(@RequestParam("nome") String nome) {
+		
+		try {
+			Pessoa pessoa = pessoaDao.findByName(nome);
+			
+			return new ResponseEntity<Pessoa>(pessoa, HttpStatus.OK);
+			
+		} catch(NoResultException e) {
+			return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
+		}
+
 	}
 	
+	@Transactional
+	@PostMapping("/pessoa/cria")
+	public ResponseEntity<Pessoa> cria(@RequestBody Pessoa novaPessoa) {
+		Pessoa pessoa = new ConversorPessoa().validaEconverteMinusculo(null, novaPessoa);
+		pessoaDao.create(pessoa);
+		return new ResponseEntity<Pessoa>(pessoa, HttpStatus.CREATED);
+	}
+	
+	@Transactional
 	@DeleteMapping("/pessoa/{id}/remove")
 	public ResponseEntity<Pessoa> deleta(@PathVariable("id") Long id) {
 		
-		if (repository.findById(id).isPresent()) {
-			repository.delete(repository.findById(id).get());
+		if (pessoaDao.findById(id) != null) {
+			pessoaDao.delete(pessoaDao.findById(id));
 			
 			return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
 		}
@@ -60,16 +82,14 @@ public class PessoaController {
 		return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
 	}
 	
+	@Transactional
 	@PutMapping("/pessoa/{id}/altera")
 	public ResponseEntity<Pessoa> atualiza(@PathVariable("id") Long id, @RequestBody Pessoa alteraPessoa) {
 		
-		if (repository.findById(id).isPresent()) {
-			Pessoa pessoa = repository.findById(id).get();
-			pessoa.setNome(alteraPessoa.getNome());
-			pessoa.setIdade(alteraPessoa.getIdade());
-			pessoa.setEmail(alteraPessoa.getEmail());
+		if (pessoaDao.findById(id) != null) {
+			Pessoa pessoa = new ConversorPessoa().validaEconverteMinusculo(pessoaDao.findById(id), alteraPessoa);
 			
-			repository.save(pessoa);
+			pessoaDao.update(pessoa);
 			
 			return new ResponseEntity<Pessoa>(pessoa, HttpStatus.OK);
 		}
