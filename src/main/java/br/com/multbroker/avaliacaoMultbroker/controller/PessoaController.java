@@ -64,7 +64,7 @@ public class PessoaController {
 	@Transactional
 	@PostMapping("/pessoa/cria")
 	public ResponseEntity<Pessoa> cria(@RequestBody Pessoa novaPessoa) {
-		Pessoa pessoa = new ConversorPessoa().validaEconverteMinusculo(null, novaPessoa);
+		Pessoa pessoa = new ConversorPessoa().moveEconverteMinusculo(null, novaPessoa);
 		pessoaDao.create(pessoa);
 		return new ResponseEntity<Pessoa>(pessoa, HttpStatus.CREATED);
 	}
@@ -87,7 +87,7 @@ public class PessoaController {
 	public ResponseEntity<Pessoa> atualiza(@PathVariable("id") Long id, @RequestBody Pessoa alteraPessoa) {
 		
 		if (pessoaDao.findById(id) != null) {
-			Pessoa pessoa = new ConversorPessoa().validaEconverteMinusculo(pessoaDao.findById(id), alteraPessoa);
+			Pessoa pessoa = new ConversorPessoa().moveEconverteMinusculo(pessoaDao.findById(id), alteraPessoa);
 			
 			pessoaDao.update(pessoa);
 			

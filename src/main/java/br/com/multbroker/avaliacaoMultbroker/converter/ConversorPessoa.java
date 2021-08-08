@@ -4,7 +4,7 @@ import br.com.multbroker.avaliacaoMultbroker.model.Pessoa;
 
 public class ConversorPessoa {
 	
-	public Pessoa validaEconverteMinusculo(Pessoa pessoa, Pessoa pessoaRequisicao) {
+	public Pessoa moveEconverteMinusculo(Pessoa pessoa, Pessoa pessoaRequisicao) {
 		
 		if (pessoa == null) {
 			pessoa = new Pessoa();
