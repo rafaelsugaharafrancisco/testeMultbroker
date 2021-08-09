@@ -31,7 +31,7 @@ public class PessoaController {
 	public ResponseEntity<List<Pessoa>> lista() {
 		
 		if (pessoaDao.findAll().isEmpty()) {
-			return new ResponseEntity<List<Pessoa>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<List<Pessoa>>(HttpStatus.NO_CONTENT);
 		}
 		
 		return new ResponseEntity<List<Pessoa>>(pessoaDao.findAll(), HttpStatus.OK);
@@ -43,7 +43,7 @@ public class PessoaController {
 		if (pessoaDao.findById(id) != null) {
 			return new ResponseEntity<Pessoa>(pessoaDao.findById(id), HttpStatus.OK);
 		} else {
-			return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
 		}
 	}
 	
@@ -56,7 +56,7 @@ public class PessoaController {
 			return new ResponseEntity<Pessoa>(pessoa, HttpStatus.OK);
 			
 		} catch(NoResultException e) {
-			return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
 		}
 
 	}
@@ -76,10 +76,10 @@ public class PessoaController {
 		if (pessoaDao.findById(id) != null) {
 			pessoaDao.delete(pessoaDao.findById(id));
 			
-			return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
+//			return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
 		}
 		
-		return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
 	}
 	
 	@Transactional
@@ -94,6 +94,6 @@ public class PessoaController {
 			return new ResponseEntity<Pessoa>(pessoa, HttpStatus.OK);
 		}
 		
-		return new ResponseEntity<Pessoa>(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
 	}
 }
