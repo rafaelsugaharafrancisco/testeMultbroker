@@ -27,7 +27,7 @@ public class PessoaController {
 	@Autowired
 	private PessoaDao pessoaDao;
 	
-	@GetMapping("/pessoas")
+	@GetMapping("/pessoa")
 	public ResponseEntity<List<Pessoa>> lista() {
 		
 		if (pessoaDao.findAll().isEmpty()) {
