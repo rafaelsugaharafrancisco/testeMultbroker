@@ -27,7 +27,7 @@ public class PessoaController {
 	@Autowired
 	private PessoaDao pessoaDao;
 	
-	@GetMapping("/pessoa/lista")
+	@GetMapping("/pessoas")
 	public ResponseEntity<List<Pessoa>> lista() {
 		
 		if (pessoaDao.findAll().isEmpty()) {
@@ -62,7 +62,7 @@ public class PessoaController {
 	}
 	
 	@Transactional
-	@PostMapping("/pessoa/cria")
+	@PostMapping("/pessoa")
 	public ResponseEntity<Pessoa> cria(@RequestBody Pessoa novaPessoa) {
 		Pessoa pessoa = new ConversorPessoa().moveEconverteMinusculo(null, novaPessoa);
 		pessoaDao.create(pessoa);
@@ -70,20 +70,20 @@ public class PessoaController {
 	}
 	
 	@Transactional
-	@DeleteMapping("/pessoa/{id}/remove")
+	@DeleteMapping("/pessoa/{id}")
 	public ResponseEntity<Pessoa> deleta(@PathVariable("id") Long id) {
 		
 		if (pessoaDao.findById(id) != null) {
 			pessoaDao.delete(pessoaDao.findById(id));
 			
-//			return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<Pessoa>(HttpStatus.OK);
 		}
 		
 		return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
 	}
 	
 	@Transactional
-	@PutMapping("/pessoa/{id}/altera")
+	@PutMapping("/pessoa/{id}")
 	public ResponseEntity<Pessoa> atualiza(@PathVariable("id") Long id, @RequestBody Pessoa alteraPessoa) {
 		
 		if (pessoaDao.findById(id) != null) {
