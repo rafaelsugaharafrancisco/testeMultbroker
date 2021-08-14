@@ -49,8 +49,8 @@ public class PessoaController {
 	@GetMapping("/busca-por/")
 	public ResponseEntity<Pessoa> buscaPorNome(@RequestParam("nome") String nome) {
 			
-		if (repository.findByNome(nome.toLowerCase()) != null) {			
-			return new ResponseEntity<Pessoa>(repository.findByNome(nome.toLowerCase()), HttpStatus.OK);
+		if (repository.findByNome(nome.toLowerCase()).isPresent()) {			
+			return new ResponseEntity<Pessoa>(repository.findByNome(nome.toLowerCase()).get(), HttpStatus.OK);
 		}
 		
 		return new ResponseEntity<Pessoa>(HttpStatus.NO_CONTENT);
